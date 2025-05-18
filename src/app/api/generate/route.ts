@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
-import { prisma } from '@/lib/prisma'
+import { PrismaClient } from '@prisma/client'
 
 const hashtagSchema = z.object({
   eventType: z.string(),
@@ -12,6 +12,8 @@ const hashtagSchema = z.object({
 })
 
 export async function POST(request: Request) {
+  const prisma = new PrismaClient()
+
   try {
     const body = await request.json()
     const data = hashtagSchema.parse(body)
@@ -147,5 +149,7 @@ export async function POST(request: Request) {
       { error: 'Failed to generate hashtags' },
       { status: 400 }
     )
+  } finally {
+    await prisma.$disconnect()
   }
 } 
